@@ -1,3 +1,4 @@
 *.backup
 output
 .terraform
+terraform.tfstate
