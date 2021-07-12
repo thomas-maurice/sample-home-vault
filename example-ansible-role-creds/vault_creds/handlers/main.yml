@@ -1,0 +1,5 @@
+---
+- name: "Reload vault credentials"
+  service:
+    name: update-vault-credentials
+    state: restarted

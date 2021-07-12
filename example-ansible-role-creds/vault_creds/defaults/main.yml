@@ -1,0 +1,10 @@
+---
+vault_host_slug: "{{ inventory_hostname | replace('.', '_') }}"
+# yamllint disable-line rule:line-length
+vault_approle_path: "{{ lookup('hashi_vault', 'secret=hosts/kv/data/hosts/'+vault_host_slug+'/approle:path') }}"
+# yamllint disable-line rule:line-length
+vault_approle_role_id: "{{ lookup('hashi_vault', 'secret=hosts/kv/data/hosts/'+vault_host_slug+'/approle:role_id') }}"
+# yamllint disable-line rule:line-length
+vault_approle_secret_id: "{{ lookup('hashi_vault', 'secret=hosts/kv/data/hosts/'+vault_host_slug+'/approle:secret_id') }}"
+vault_server_url: https://vault.example.com
+vault_certificates: []

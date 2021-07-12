@@ -1,0 +1,80 @@
+---
+- name: Create the vault-users group
+  group:
+    name: vault-users
+    state: present
+    system: true
+- name: Add the syslog user to the group
+  user:
+    name: syslog
+    groups: vault-users
+    create_home: false
+    move_home: false
+    append: yes
+- name: "Install Vault host credentials"
+  template:
+    src: vault_creds.j2
+    dest: /etc/default/vault_creds
+    owner: root
+    group: vault-users
+    mode: "0640"
+  notify: "Reload vault credentials"
+- name: "Install Vault certificates list"
+  template:
+    src: vault_certificates.j2
+    dest: /etc/default/vault_certificates
+    owner: root
+    group: vault-users
+    mode: "0640"
+  notify: "Reload vault credentials"
+- name: "Copy vault helper script"
+  copy:
+    src: update-vault-credentials.sh
+    dest: /usr/local/bin/update-vault-credentials.sh
+    owner: root
+    group: vault-users
+    mode: "0750"
+  notify: "Reload vault credentials"
+- name: "Copy vault login script"
+  copy:
+    src: vault-login.sh
+    dest: /usr/local/bin/vault-login.sh
+    owner: root
+    group: vault-users
+    mode: "0750"
+  notify: "Reload vault credentials"
+- name: "Copy vault credentials loader helper script"
+  copy:
+    src: load-vault-credentials.sh
+    dest: /usr/local/bin/load-vault-credentials.sh
+    owner: root
+    group: vault-users
+    mode: "0750"
+  notify: "Reload vault credentials"
+- name: "Copy vault creds update service"
+  copy:
+    src: update-vault-credentials.service
+    dest: /etc/systemd/system/update-vault-credentials.service
+    owner: root
+    group: root
+    mode: "0640"
+  notify: "Reload vault credentials"
+- name: "Copy vault helper timer"
+  copy:
+    src: update-vault-credentials.timer
+    dest: /etc/systemd/system/update-vault-credentials.timer
+    owner: root
+    group: root
+    mode: "0640"
+  notify: "Reload vault credentials"
+- name: "Reload systemd"
+  shell: systemctl daemon-reload
+- name: "Enables automatic vault credentials rotations"
+  systemd:
+    name: update-vault-credentials.timer
+    state: started
+    enabled: yes
+- name: "Vault credentials rotations"
+  service:
+    name: update-vault-credentials
+    state: restarted

@@ -1,0 +1,7 @@
+version: '3'
+services:
+  vault:
+    image: "vault:1.7.3"
+    command: "server -dev --dev-root-token-id devtoken"
+    privileged: true
+    network_mode: host
